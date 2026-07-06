@@ -1,16 +1,27 @@
-# React + Vite
+# Phoenix Pantry
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Phoenix Pantry is a web application that helps busy families reduce food waste by tracking pantry items, monitoring expiry dates, and providing smart reminders before food expires.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- 🔐 Google Sign-In
+- 📦 Pantry management
+- 📅 Expiry date tracking
+- 🔔 Expiry alerts
+- 📱 Mobile-friendly design
 
-## React Compiler
+## Technology
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React
+- Vite
+- Firebase Authentication
+- Firestore
+- Firebase Hosting
 
-## Expanding the ESLint configuration
+## Status
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+**Version:** v0.1.0
+
+---
+
+Built as part of **Project Phoenix** 🚀
