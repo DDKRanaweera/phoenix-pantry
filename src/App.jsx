@@ -1,30 +1,57 @@
+import { useState } from "react";
 import "./App.css";
-import { login } from "./services/auth";
+
+import Header from "./components/Header";
+import Dashboard from "./components/Dashboard";
+
+import { login, logout } from "./services/auth";
 
 function App() {
+  const [user, setUser] = useState(null);
+
   async function handleLogin() {
     try {
-      const user = await login();
-      alert(`Welcome ${user.displayName}!`);
+      const loggedInUser = await login();
+      setUser(loggedInUser);
     } catch (error) {
-      alert("Login cancelled or failed.");
+      console.error(error);
     }
   }
 
-  return (
-    <div className="container">
-      <div className="card">
-        <h1>Phoenix Pantry</h1>
+  async function handleLogout() {
+    try {
+      await logout();
+      setUser(null);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
-        <p>
-          Helping families reduce food waste.
-        </p>
+  if (!user) {
+    return (
+      <div className="container">
+        <div className="card">
+          <h1>Phoenix Pantry</h1>
 
-        <button onClick={handleLogin}>
-          Sign in with Google
-        </button>
+          <p>Helping families reduce food waste.</p>
+
+          <button onClick={handleLogin}>
+            Sign in with Google
+          </button>
+        </div>
       </div>
-    </div>
+    );
+  }
+
+  return (
+    <>
+      <Header
+        user={user}
+        onLogout={handleLogout}
+      />
+
+      <Dashboard />
+    </>
   );
 }
 
