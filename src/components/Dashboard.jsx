@@ -1,4 +1,6 @@
-function Dashboard() {
+import AddPantryItem from "./AddPantryItem";
+
+function Dashboard({ onSave }) {
   return (
     <div
       style={{
@@ -12,9 +14,8 @@ function Dashboard() {
       <div
         style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))",
           gap: "20px",
-          marginTop: "20px",
         }}
       >
         <div className="card">
@@ -33,9 +34,7 @@ function Dashboard() {
         </div>
       </div>
 
-      <div style={{ marginTop: "30px" }}>
-        <button>Add Pantry Item</button>
-      </div>
+      <AddPantryItem onSave={onSave} />
     </div>
   );
 }

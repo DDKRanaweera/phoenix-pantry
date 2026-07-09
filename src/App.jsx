@@ -5,6 +5,7 @@ import Header from "./components/Header";
 import Dashboard from "./components/Dashboard";
 
 import { login, logout } from "./services/auth";
+import { addPantryItem } from "./services/pantry";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -24,6 +25,17 @@ function App() {
       setUser(null);
     } catch (error) {
       console.error(error);
+    }
+  }
+
+  async function handleSaveItem(item) {
+    try {
+      await addPantryItem(user.uid, item);
+
+      alert("Item saved successfully!");
+    } catch (error) {
+      console.error(error);
+      alert("Failed to save item.");
     }
   }
 
@@ -50,7 +62,7 @@ function App() {
         onLogout={handleLogout}
       />
 
-      <Dashboard />
+      <Dashboard onSave={handleSaveItem} />
     </>
   );
 }
