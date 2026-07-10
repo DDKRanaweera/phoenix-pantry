@@ -10,7 +10,7 @@ function AddPantryItem({ onSave }) {
 
     onSave({
       name,
-      quantity,
+      quantity: Number(quantity),
       expiry,
     });
 
