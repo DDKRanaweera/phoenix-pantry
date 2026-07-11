@@ -1,6 +1,7 @@
 import AddPantryItem from "./AddPantryItem";
+import PantryList from "./PantryList";
 
-function Dashboard({ onSave }) {
+function Dashboard({ onSave, items }) {
   return (
     <div
       style={{
@@ -20,7 +21,7 @@ function Dashboard({ onSave }) {
       >
         <div className="card">
           <h2>📦 Pantry Items</h2>
-          <h1>0</h1>
+          <h1>{items.length}</h1>
         </div>
 
         <div className="card">
@@ -35,6 +36,8 @@ function Dashboard({ onSave }) {
       </div>
 
       <AddPantryItem onSave={onSave} />
+
+      <PantryList items={items} />
     </div>
   );
 }

@@ -1,19 +1,21 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 
 import Header from "./components/Header";
 import Dashboard from "./components/Dashboard";
 
 import { login, logout } from "./services/auth";
-import { addPantryItem } from "./services/pantry";
+import { addPantryItem, getPantryItems } from "./services/pantry";
 
 function App() {
   const [user, setUser] = useState(null);
+  const [items, setItems] = useState([]);
 
   async function handleLogin() {
     try {
       const loggedInUser = await login();
       setUser(loggedInUser);
+      await loadPantryItems(loggedInUser.uid);
     } catch (error) {
       console.error(error);
     }
@@ -28,9 +30,19 @@ function App() {
     }
   }
 
+  async function loadPantryItems(userId) {
+    try {
+      const pantryItems = await getPantryItems(userId);
+      setItems(pantryItems);
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
   async function handleSaveItem(item) {
     try {
       await addPantryItem(user.uid, item);
+      await loadPantryItems(user.uid);
 
       alert("Item saved successfully!");
     } catch (error) {
@@ -38,6 +50,12 @@ function App() {
       alert("Failed to save item.");
     }
   }
+  
+  useEffect(() => {
+  if (user) {
+    loadPantryItems(user.uid);
+  }
+}, [user]);
 
   if (!user) {
     return (
@@ -62,7 +80,10 @@ function App() {
         onLogout={handleLogout}
       />
 
-      <Dashboard onSave={handleSaveItem} />
+      <Dashboard
+        onSave={handleSaveItem}
+        items={items}
+      />
     </>
   );
 }
