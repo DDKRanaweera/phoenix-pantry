@@ -1,4 +1,4 @@
-function PantryList({ items }) {
+function PantryList({ items, onDelete }) {
   if (items.length === 0) {
     return (
       <div className="card" style={{ marginTop: "30px" }}>
@@ -27,6 +27,22 @@ function PantryList({ items }) {
           <p>Quantity: {item.quantity}</p>
 
           <p>Expiry: {item.expiry}</p>
+
+          <button
+            onClick={() => onDelete(item.id)}
+
+            style={{
+                  marginTop: "10px",
+                  backgroundColor: "#dc3545",
+                  color: "white",
+                  border: "none",
+                  padding: "8px 14px",
+             borderRadius: "6px",
+             cursor: "pointer",
+             }}
+            >
+           🗑 Delete
+          </button>
         </div>
       ))}
     </div>

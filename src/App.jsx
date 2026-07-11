@@ -5,7 +5,11 @@ import Header from "./components/Header";
 import Dashboard from "./components/Dashboard";
 
 import { login, logout } from "./services/auth";
-import { addPantryItem, getPantryItems } from "./services/pantry";
+import {
+  addPantryItem,
+  getPantryItems,
+  deletePantryItem,
+} from "./services/pantry";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -51,6 +55,19 @@ function App() {
     }
   }
   
+  async function handleDeleteItem(itemId) {
+  try {
+    await deletePantryItem(user.uid, itemId);
+
+    await loadPantryItems(user.uid);
+
+    alert("Item deleted successfully!");
+  } catch (error) {
+    console.error(error);
+    alert("Failed to delete item.");
+  }
+}
+
   useEffect(() => {
   if (user) {
     loadPantryItems(user.uid);
@@ -82,7 +99,8 @@ function App() {
 
       <Dashboard
         onSave={handleSaveItem}
-        items={items}
+        onDelete={handleDeleteItem}
+         items={items}
       />
     </>
   );
