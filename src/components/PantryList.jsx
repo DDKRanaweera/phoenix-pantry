@@ -1,4 +1,4 @@
-function PantryList({ items, onDelete }) {
+function PantryList({ items, onDelete, onEdit }) {
   if (items.length === 0) {
     return (
       <div className="card" style={{ marginTop: "30px" }}>
@@ -28,21 +28,41 @@ function PantryList({ items, onDelete }) {
 
           <p>Expiry: {item.expiry}</p>
 
-          <button
-            onClick={() => onDelete(item.id)}
-
+          <div
             style={{
-                  marginTop: "10px",
-                  backgroundColor: "#dc3545",
-                  color: "white",
-                  border: "none",
-                  padding: "8px 14px",
-             borderRadius: "6px",
-             cursor: "pointer",
-             }}
+              display: "flex",
+              gap: "10px",
+              marginTop: "10px",
+            }}
+          >
+            <button
+              onClick={() => onEdit(item)}
+              style={{
+                backgroundColor: "#0d6efd",
+                color: "white",
+                border: "none",
+                padding: "8px 14px",
+                borderRadius: "6px",
+                cursor: "pointer",
+              }}
             >
-           🗑 Delete
-          </button>
+              ✏ Edit
+            </button>
+
+            <button
+              onClick={() => onDelete(item.id)}
+              style={{
+                backgroundColor: "#dc3545",
+                color: "white",
+                border: "none",
+                padding: "8px 14px",
+                borderRadius: "6px",
+                cursor: "pointer",
+              }}
+            >
+              🗑 Delete
+            </button>
+          </div>
         </div>
       ))}
     </div>

@@ -9,11 +9,13 @@ import {
   addPantryItem,
   getPantryItems,
   deletePantryItem,
+  updatePantryItem,
 } from "./services/pantry";
 
 function App() {
   const [user, setUser] = useState(null);
   const [items, setItems] = useState([]);
+  const [editingItem, setEditingItem] = useState(null);
 
   async function handleLogin() {
     try {
@@ -44,16 +46,26 @@ function App() {
   }
 
   async function handleSaveItem(item) {
-    try {
+  try {
+    if (editingItem) {
+      await updatePantryItem(user.uid, editingItem.id, item);
+
+      alert("Item updated successfully!");
+    } else {
       await addPantryItem(user.uid, item);
-      await loadPantryItems(user.uid);
 
       alert("Item saved successfully!");
-    } catch (error) {
-      console.error(error);
-      alert("Failed to save item.");
     }
+
+    await loadPantryItems(user.uid);
+
+    setEditingItem(null);
+
+  } catch (error) {
+    console.error(error);
+    alert("Failed to save item.");
   }
+}
   
   async function handleDeleteItem(itemId) {
   try {
@@ -66,6 +78,10 @@ function App() {
     console.error(error);
     alert("Failed to delete item.");
   }
+}
+
+function handleEditItem(item) {
+  setEditingItem(item);
 }
 
   useEffect(() => {
@@ -98,9 +114,11 @@ function App() {
       />
 
       <Dashboard
+        items={items}
         onSave={handleSaveItem}
         onDelete={handleDeleteItem}
-         items={items}
+        onEdit={handleEditItem}
+        editingItem={editingItem}
       />
     </>
   );

@@ -1,9 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-function AddPantryItem({ onSave }) {
+function AddPantryItem({ onSave, editingItem }) {
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState("");
   const [expiry, setExpiry] = useState("");
+
+  useEffect(() => {
+  if (editingItem) {
+    setName(editingItem.name);
+    setQuantity(editingItem.quantity);
+    setExpiry(editingItem.expiry);
+  }
+}, [editingItem]);
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -21,7 +29,9 @@ function AddPantryItem({ onSave }) {
 
   return (
     <div className="card" style={{ marginTop: "30px" }}>
-      <h2>Add Pantry Item</h2>
+      <h2>
+          {editingItem ? "Edit Pantry Item" : "Add Pantry Item"}
+      </h2>
 
       <form onSubmit={handleSubmit}>
 
@@ -55,7 +65,7 @@ function AddPantryItem({ onSave }) {
         <br /><br />
 
         <button type="submit">
-          Save Item
+              {editingItem ? "Save Changes" : "Save Item"}
         </button>
 
       </form>

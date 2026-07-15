@@ -6,6 +6,7 @@ import {
   query,
   orderBy,
   deleteDoc,
+  updateDoc,
   doc,
 } from "firebase/firestore";
 
@@ -37,4 +38,12 @@ export async function deletePantryItem(userId, itemId) {
   const itemRef = doc(db, "users", userId, "pantry", itemId);
 
   await deleteDoc(itemRef);
+}
+
+export async function updatePantryItem(userId, itemId, item) {
+  const itemRef = doc(db, "users", userId, "pantry", itemId);
+
+  await updateDoc(itemRef, {
+    ...item,
+  });
 }
