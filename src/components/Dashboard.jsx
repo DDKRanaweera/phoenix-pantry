@@ -17,7 +17,8 @@ function Dashboard({
   let weekCount = 0;
 
   items.forEach((item) => {
-    const expiry = new Date(item.expiry);
+    const [year, month, day] = item.expiry.split("-").map(Number);
+    const expiry = new Date(year, month - 1, day);
 
     expiry.setHours(0, 0, 0, 0);
 
