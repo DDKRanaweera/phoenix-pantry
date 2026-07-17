@@ -1,3 +1,5 @@
+import { useState } from "react";
+
 import AddPantryItem from "./AddPantryItem";
 import PantryList from "./PantryList";
 
@@ -8,8 +10,9 @@ function Dashboard({
   onEdit,
   editingItem,
 }) {
-  const today = new Date();
+  const [search, setSearch] = useState("");
 
+  const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   let expired = 0;
@@ -34,6 +37,10 @@ function Dashboard({
       weekCount++;
     }
   });
+
+  const filteredItems = items.filter((item) =>
+    item.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div
@@ -72,8 +79,34 @@ function Dashboard({
         editingItem={editingItem}
       />
 
+      <div className="card" style={{ marginTop: "30px" }}>
+        <h2>🔍 Search Pantry</h2>
+
+        <input
+          type="text"
+          placeholder="Search by item name..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
+
+        {search && (
+          <>
+            <p style={{ marginTop: "15px" }}>
+              Showing <strong>{filteredItems.length}</strong> result(s)
+            </p>
+
+            <button
+              style={{ marginTop: "10px" }}
+              onClick={() => setSearch("")}
+            >
+              Clear Search
+            </button>
+          </>
+        )}
+      </div>
+
       <PantryList
-        items={items}
+        items={filteredItems}
         onDelete={onDelete}
         onEdit={onEdit}
       />

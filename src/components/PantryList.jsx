@@ -61,7 +61,10 @@ function PantryList({ items, onDelete, onEdit }) {
     return (
       <div className="card" style={{ marginTop: "30px" }}>
         <h2>📋 My Pantry</h2>
-        <p>No pantry items yet.</p>
+
+        <h3>No matching pantry items found.</h3>
+
+        <p>Try searching with a different name or add a new pantry item.</p>
       </div>
     );
   }
@@ -81,11 +84,17 @@ function PantryList({ items, onDelete, onEdit }) {
             <h2>{item.name}</h2>
 
             <p>
+              <strong>🏷 Category:</strong>{" "}
+              {item.category || "Pantry"}
+            </p>
+
+            <p>
               <strong>📦 Quantity:</strong> {item.quantity}
             </p>
 
             <p>
-              <strong>📅 Expiry:</strong> {formatDate(item.expiry)}
+              <strong>📅 Expiry:</strong>{" "}
+              {formatDate(item.expiry)}
             </p>
 
             <p
@@ -98,9 +107,7 @@ function PantryList({ items, onDelete, onEdit }) {
             </p>
 
             <div className="list-buttons">
-              <button
-                onClick={() => onEdit(item)}
-              >
+              <button onClick={() => onEdit(item)}>
                 ✏ Edit
               </button>
 
