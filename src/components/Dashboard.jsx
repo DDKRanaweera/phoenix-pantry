@@ -2,6 +2,29 @@ import { useState } from "react";
 
 import AddPantryItem from "./AddPantryItem";
 import PantryList from "./PantryList";
+import CategoryChart from "./CategoryChart";
+import ExpiryChart from "./ExpiryChart";
+
+import { getExpiryStatus } from "../utils/dateUtils";
+
+import {
+  Grid,
+  Card,
+  CardContent,
+  Typography,
+  TextField,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Stack,
+} from "@mui/material";
+
+import Inventory2Icon from "@mui/icons-material/Inventory2";
+import WarningAmberIcon from "@mui/icons-material/WarningAmber";
+import EventAvailableIcon from "@mui/icons-material/EventAvailable";
+import ErrorIcon from "@mui/icons-material/Error";
 
 function Dashboard({
   items,
@@ -11,99 +34,234 @@ function Dashboard({
   editingItem,
 }) {
   const [search, setSearch] = useState("");
-
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
+  const [selectedCategory, setSelectedCategory] = useState("All");
 
   let expired = 0;
   let todayCount = 0;
   let weekCount = 0;
 
   items.forEach((item) => {
-    const [year, month, day] = item.expiry.split("-").map(Number);
-    const expiry = new Date(year, month - 1, day);
+    const status = getExpiryStatus(item.expiry);
 
-    expiry.setHours(0, 0, 0, 0);
-
-    const diffDays = Math.floor(
-      (expiry - today) / (1000 * 60 * 60 * 24)
-    );
-
-    if (diffDays < 0) {
+    if (status.diffDays < 0) {
       expired++;
-    } else if (diffDays === 0) {
+    } else if (status.diffDays === 0) {
       todayCount++;
-    } else if (diffDays <= 7) {
+    } else if (status.diffDays <= 7) {
       weekCount++;
     }
   });
 
-  const filteredItems = items.filter((item) =>
-    item.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredItems = items.filter((item) => {
+    const matchesSearch =
+      item.name.toLowerCase().includes(search.toLowerCase());
+
+    const matchesCategory =
+      selectedCategory === "All" ||
+      (item.category || "Pantry") === selectedCategory;
+
+    return matchesSearch && matchesCategory;
+  });
 
   return (
     <div
       style={{
-        maxWidth: "1000px",
+        maxWidth: "1200px",
         margin: "30px auto",
         padding: "20px",
       }}
     >
-      <h1>📊 Dashboard</h1>
+      <Typography
+        variant="h3"
+        align="center"
+        gutterBottom
+        fontWeight="bold"
+      >
+        📊 Dashboard
+      </Typography>
 
-      <div className="stats-grid">
-        <div className="stat-card">
-          <h2>📦 Pantry Items</h2>
-          <h1>{items.length}</h1>
-        </div>
+      {/* Statistics */}
 
-        <div className="stat-card">
-          <h2>⚠ Expiring Today</h2>
-          <h1>{todayCount}</h1>
-        </div>
+      <Grid container spacing={3} sx={{ mb: 4 }}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card elevation={4} sx={{ borderRadius: 3 }}>
+            <CardContent sx={{ textAlign: "center" }}>
+              <Inventory2Icon
+                sx={{ fontSize: 55, color: "#2E7D32" }}
+              />
 
-        <div className="stat-card">
-          <h2>🟠 Expiring This Week</h2>
-          <h1>{weekCount}</h1>
-        </div>
+              <Typography variant="h3">
+                {items.length}
+              </Typography>
 
-        <div className="stat-card">
-          <h2>❌ Expired</h2>
-          <h1>{expired}</h1>
-        </div>
-      </div>
+              <Typography>
+                Pantry Items
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3}>
+          <Card elevation={4} sx={{ borderRadius: 3 }}>
+            <CardContent sx={{ textAlign: "center" }}>
+              <WarningAmberIcon
+                sx={{ fontSize: 55, color: "#ef6c00" }}
+              />
+
+              <Typography variant="h3">
+                {todayCount}
+              </Typography>
+
+              <Typography>
+                Expiring Today
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3}>
+          <Card elevation={4} sx={{ borderRadius: 3 }}>
+            <CardContent sx={{ textAlign: "center" }}>
+              <EventAvailableIcon
+                sx={{ fontSize: 55, color: "#1565C0" }}
+              />
+
+              <Typography variant="h3">
+                {weekCount}
+              </Typography>
+
+              <Typography>
+                Next 7 Days
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+
+        <Grid item xs={12} sm={6} md={3}>
+          <Card elevation={4} sx={{ borderRadius: 3 }}>
+            <CardContent sx={{ textAlign: "center" }}>
+              <ErrorIcon
+                sx={{ fontSize: 55, color: "#D32F2F" }}
+              />
+
+              <Typography variant="h3">
+                {expired}
+              </Typography>
+
+              <Typography>
+                Expired
+              </Typography>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* Charts */}
+
+      <Grid
+        container
+        spacing={3}
+        sx={{ mb: 4 }}
+        alignItems="stretch"
+      >
+        <Grid item xs={12} lg={5}>
+          <CategoryChart items={items} />
+        </Grid>
+
+        <Grid item xs={12} lg={7}>
+          <ExpiryChart items={items} />
+        </Grid>
+      </Grid>
+
+      {/* Add Item */}
 
       <AddPantryItem
         onSave={onSave}
         editingItem={editingItem}
       />
 
-      <div className="card" style={{ marginTop: "30px" }}>
-        <h2>🔍 Search Pantry</h2>
+      {/* Search */}
 
-        <input
-          type="text"
-          placeholder="Search by item name..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
+      <Card
+        elevation={5}
+        sx={{
+          mt: 4,
+          borderRadius: 3,
+        }}
+      >
+        <CardContent>
 
-        {search && (
-          <>
-            <p style={{ marginTop: "15px" }}>
-              Showing <strong>{filteredItems.length}</strong> result(s)
-            </p>
+          <Typography
+            variant="h5"
+            align="center"
+            fontWeight="bold"
+            gutterBottom
+          >
+            🔍 Search & Filter Pantry
+          </Typography>
 
-            <button
-              style={{ marginTop: "10px" }}
-              onClick={() => setSearch("")}
-            >
-              Clear Search
-            </button>
-          </>
-        )}
-      </div>
+          <Stack spacing={3}>
+
+            <TextField
+              label="Search Item"
+              fullWidth
+              value={search}
+              onChange={(e) =>
+                setSearch(e.target.value)
+              }
+            />
+
+            <FormControl fullWidth>
+
+              <InputLabel>
+                Category
+              </InputLabel>
+
+              <Select
+                value={selectedCategory}
+                label="Category"
+                onChange={(e) =>
+                  setSelectedCategory(e.target.value)
+                }
+              >
+                <MenuItem value="All">All Categories</MenuItem>
+                <MenuItem value="Pantry">🥫 Pantry</MenuItem>
+                <MenuItem value="Dairy">🥛 Dairy</MenuItem>
+                <MenuItem value="Fruit">🍎 Fruit</MenuItem>
+                <MenuItem value="Vegetables">🥦 Vegetables</MenuItem>
+                <MenuItem value="Meat">🥩 Meat</MenuItem>
+                <MenuItem value="Frozen">🧊 Frozen</MenuItem>
+                <MenuItem value="Drinks">🥤 Drinks</MenuItem>
+                <MenuItem value="Snacks">🍪 Snacks</MenuItem>
+                <MenuItem value="Bakery">🍞 Bakery</MenuItem>
+                <MenuItem value="Other">📦 Other</MenuItem>
+              </Select>
+
+            </FormControl>
+
+            <Typography align="center">
+              Showing <strong>{filteredItems.length}</strong> item(s)
+            </Typography>
+
+            {(search || selectedCategory !== "All") && (
+              <Button
+                variant="outlined"
+                color="secondary"
+                onClick={() => {
+                  setSearch("");
+                  setSelectedCategory("All");
+                }}
+              >
+                Clear Filters
+              </Button>
+            )}
+
+          </Stack>
+
+        </CardContent>
+      </Card>
+
+      {/* Pantry List */}
 
       <PantryList
         items={filteredItems}

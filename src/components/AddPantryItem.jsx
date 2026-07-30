@@ -1,4 +1,18 @@
 import { useState, useEffect } from "react";
+import BarcodeScanner from "./BarcodeScanner";
+
+import {
+  Card,
+  CardContent,
+  Typography,
+  TextField,
+  Button,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Collapse,
+} from "@mui/material";
 
 function AddPantryItem({ onSave, editingItem }) {
   const [name, setName] = useState("");
@@ -6,19 +20,29 @@ function AddPantryItem({ onSave, editingItem }) {
   const [expiry, setExpiry] = useState("");
   const [category, setCategory] = useState("Pantry");
 
+  const [barcode, setBarcode] = useState("");
+  const [showScanner, setShowScanner] = useState(false);
+
   useEffect(() => {
     if (editingItem) {
       setName(editingItem.name);
       setQuantity(editingItem.quantity);
       setExpiry(editingItem.expiry);
       setCategory(editingItem.category || "Pantry");
+      setBarcode(editingItem.barcode || "");
     } else {
-      setName("");
-      setQuantity("");
-      setExpiry("");
-      setCategory("Pantry");
+      resetForm();
     }
   }, [editingItem]);
+
+  function resetForm() {
+    setName("");
+    setQuantity("");
+    setExpiry("");
+    setCategory("Pantry");
+    setBarcode("");
+    setShowScanner(false);
+  }
 
   function handleSubmit(e) {
     e.preventDefault();
@@ -28,82 +52,207 @@ function AddPantryItem({ onSave, editingItem }) {
       quantity: Number(quantity),
       expiry,
       category,
+      barcode,
     });
 
-    setName("");
-    setQuantity("");
-    setExpiry("");
-    setCategory("Pantry");
+    resetForm();
+  }
+
+  function mapCategory(apiCategory) {
+    if (!apiCategory) return "Pantry";
+
+    const value = apiCategory.toLowerCase();
+
+    if (
+      value.includes("milk") ||
+      value.includes("dairy") ||
+      value.includes("cheese") ||
+      value.includes("yogurt")
+    ) {
+      return "Dairy";
+    }
+
+    if (value.includes("fruit")) {
+      return "Fruit";
+    }
+
+    if (
+      value.includes("vegetable") ||
+      value.includes("vegetables")
+    ) {
+      return "Vegetables";
+    }
+
+    if (
+      value.includes("meat") ||
+      value.includes("beef") ||
+      value.includes("pork") ||
+      value.includes("chicken")
+    ) {
+      return "Meat";
+    }
+
+    if (value.includes("frozen")) {
+      return "Frozen";
+    }
+
+    if (
+      value.includes("drink") ||
+      value.includes("beverage") ||
+      value.includes("juice") ||
+      value.includes("soda")
+    ) {
+      return "Drinks";
+    }
+
+    if (
+      value.includes("snack") ||
+      value.includes("chips") ||
+      value.includes("cookie")
+    ) {
+      return "Snacks";
+    }
+
+    if (
+      value.includes("bread") ||
+      value.includes("bakery") ||
+      value.includes("cake")
+    ) {
+      return "Bakery";
+    }
+
+    return "Pantry";
+  }
+
+  function handleDetected(product) {
+    setBarcode(product.barcode || "");
+
+    if (product.name) {
+      setName(product.name);
+    }
+
+    if (product.category) {
+      setCategory(mapCategory(product.category));
+    }
+
+    setShowScanner(false);
   }
 
   return (
-    <div className="card" style={{ marginTop: "30px" }}>
-      <h2>
-        {editingItem ? "Edit Pantry Item" : "Add Pantry Item"}
-      </h2>
-
-      <form onSubmit={handleSubmit}>
-
-        <input
-          type="text"
-          placeholder="Item Name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          required
-        />
-
-        <br /><br />
-
-        <input
-          type="number"
-          placeholder="Quantity"
-          value={quantity}
-          onChange={(e) => setQuantity(e.target.value)}
-          required
-        />
-
-        <br /><br />
-
-        <input
-          type="date"
-          value={expiry}
-          onChange={(e) => setExpiry(e.target.value)}
-          required
-        />
-
-        <br /><br />
-
-        <select
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "12px",
-            borderRadius: "8px",
-            border: "1px solid #ccc",
-            fontSize: "16px",
-          }}
+    <Card
+      elevation={5}
+      sx={{
+        mt: 4,
+        borderRadius: 3,
+      }}
+    >
+      <CardContent>
+        <Typography
+          variant="h5"
+          fontWeight="bold"
+          align="center"
+          gutterBottom
         >
-          <option value="Pantry">🥫 Pantry</option>
-          <option value="Dairy">🥛 Dairy</option>
-          <option value="Fruit">🍎 Fruit</option>
-          <option value="Vegetables">🥦 Vegetables</option>
-          <option value="Meat">🥩 Meat</option>
-          <option value="Frozen">🧊 Frozen</option>
-          <option value="Drinks">🥤 Drinks</option>
-          <option value="Snacks">🍪 Snacks</option>
-          <option value="Bakery">🍞 Bakery</option>
-          <option value="Other">📦 Other</option>
-        </select>
+          {editingItem ? "Edit Pantry Item" : "Add Pantry Item"}
+        </Typography>
 
-        <br /><br />
+        <form onSubmit={handleSubmit}>
+          <Button
+            type="button"
+            variant="outlined"
+            fullWidth
+            sx={{ mb: 2 }}
+            onClick={() => setShowScanner(!showScanner)}
+          >
+            {showScanner ? "Close Scanner" : "📷 Scan Barcode"}
+          </Button>
 
-        <button type="submit">
-          {editingItem ? "Save Changes" : "Save Item"}
-        </button>
+          <Collapse in={showScanner}>
+            <BarcodeScanner onDetected={handleDetected} />
+          </Collapse>
 
-      </form>
-    </div>
+          <TextField
+            fullWidth
+            label="Barcode"
+            margin="normal"
+            value={barcode}
+            InputProps={{
+              readOnly: true,
+            }}
+          />
+
+          <TextField
+            fullWidth
+            label="Item Name"
+            margin="normal"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            required
+          />
+
+          <TextField
+            fullWidth
+            label="Quantity"
+            type="number"
+            margin="normal"
+            value={quantity}
+            onChange={(e) => setQuantity(e.target.value)}
+            required
+          />
+
+          <TextField
+            fullWidth
+            label="Expiry Date"
+            type="date"
+            margin="normal"
+            value={expiry}
+            onChange={(e) => setExpiry(e.target.value)}
+            InputLabelProps={{
+              shrink: true,
+            }}
+            required
+          />
+
+          <FormControl
+            fullWidth
+            margin="normal"
+          >
+            <InputLabel>Category</InputLabel>
+
+            <Select
+              value={category}
+              label="Category"
+              onChange={(e) => setCategory(e.target.value)}
+            >
+              <MenuItem value="Pantry">🥫 Pantry</MenuItem>
+              <MenuItem value="Dairy">🥛 Dairy</MenuItem>
+              <MenuItem value="Fruit">🍎 Fruit</MenuItem>
+              <MenuItem value="Vegetables">🥦 Vegetables</MenuItem>
+              <MenuItem value="Meat">🥩 Meat</MenuItem>
+              <MenuItem value="Frozen">🧊 Frozen</MenuItem>
+              <MenuItem value="Drinks">🥤 Drinks</MenuItem>
+              <MenuItem value="Snacks">🍪 Snacks</MenuItem>
+              <MenuItem value="Bakery">🍞 Bakery</MenuItem>
+              <MenuItem value="Other">📦 Other</MenuItem>
+            </Select>
+          </FormControl>
+
+          <Button
+            type="submit"
+            variant="contained"
+            color="success"
+            fullWidth
+            size="large"
+            sx={{
+              mt: 3,
+              py: 1.5,
+            }}
+          >
+            {editingItem ? "Save Changes" : "Save Item"}
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
 

@@ -12,6 +12,15 @@ import {
   updatePantryItem,
 } from "./services/pantry";
 
+import {
+  Box,
+  Paper,
+  Typography,
+  Button,
+} from "@mui/material";
+
+import GoogleIcon from "@mui/icons-material/Google";
+
 function App() {
   const [user, setUser] = useState(null);
   const [items, setItems] = useState([]);
@@ -91,20 +100,62 @@ function handleEditItem(item) {
 }, [user]);
 
   if (!user) {
-    return (
-      <div className="container">
-        <div className="card">
-          <h1>Phoenix Pantry</h1>
+  return (
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        background:
+          "linear-gradient(135deg,#E8F5E9,#F1F8E9)",
+        padding: 3,
+      }}
+    >
+      <Paper
+        elevation={8}
+        sx={{
+          padding: 5,
+          borderRadius: 4,
+          width: 420,
+          textAlign: "center",
+        }}
+      >
+        <Typography
+          variant="h3"
+          fontWeight="bold"
+          color="success.main"
+          gutterBottom
+        >
+          🥗 Phoenix Pantry
+        </Typography>
 
-          <p>Helping families reduce food waste.</p>
+        <Typography
+          variant="body1"
+          color="text.secondary"
+          sx={{ mb: 4 }}
+        >
+          Helping families reduce food waste
+        </Typography>
 
-          <button onClick={handleLogin}>
-            Sign in with Google
-          </button>
-        </div>
-      </div>
-    );
-  }
+        <Button
+          variant="contained"
+          size="large"
+          startIcon={<GoogleIcon />}
+          fullWidth
+          onClick={handleLogin}
+          sx={{
+            py: 1.5,
+            borderRadius: 3,
+            fontSize: "16px",
+          }}
+        >
+          Sign in with Google
+        </Button>
+      </Paper>
+    </Box>
+  );
+}
 
   return (
     <>

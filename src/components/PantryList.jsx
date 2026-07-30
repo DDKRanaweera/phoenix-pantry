@@ -1,128 +1,151 @@
+import {
+  Card,
+  CardContent,
+  Typography,
+  Button,
+  Chip,
+  Stack,
+  Grid,
+  Divider,
+} from "@mui/material";
+
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+
+import { formatDate, getExpiryStatus } from "../utils/dateUtils";
+
 function PantryList({ items, onDelete, onEdit }) {
-  function getExpiryStatus(expiryDate) {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const [year, month, day] = expiryDate.split("-").map(Number);
-    const expiry = new Date(year, month - 1, day);
-    expiry.setHours(0, 0, 0, 0);
-
-    const diffDays = Math.floor(
-      (expiry - today) / (1000 * 60 * 60 * 24)
-    );
-
-    if (diffDays < 0) {
-      return {
-        text: `❌ Expired ${Math.abs(diffDays)} day(s) ago`,
-        color: "#d32f2f",
-      };
-    }
-
-    if (diffDays === 0) {
-      return {
-        text: "⚠ Expires Today",
-        color: "#f57c00",
-      };
-    }
-
-    if (diffDays === 1) {
-      return {
-        text: "🟡 Expires Tomorrow",
-        color: "#f9a825",
-      };
-    }
-
-    if (diffDays <= 7) {
-      return {
-        text: `🟠 ${diffDays} days left`,
-        color: "#ef6c00",
-      };
-    }
-
-    return {
-      text: `🟢 ${diffDays} days left`,
-      color: "#2e7d32",
-    };
-  }
-
-  function formatDate(dateString) {
-    const [year, month, day] = dateString.split("-").map(Number);
-
-    const date = new Date(year, month - 1, day);
-
-    return date.toLocaleDateString("en-CA", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  }
-
   if (items.length === 0) {
     return (
-      <div className="card" style={{ marginTop: "30px" }}>
-        <h2>📋 My Pantry</h2>
+      <Card
+        elevation={5}
+        sx={{
+          mt: 4,
+          borderRadius: 3,
+        }}
+      >
+        <CardContent sx={{ textAlign: "center" }}>
+          <Typography
+            variant="h5"
+            gutterBottom
+            fontWeight="bold"
+          >
+            📋 My Pantry
+          </Typography>
 
-        <h3>No matching pantry items found.</h3>
+          <Typography variant="h6">
+            No matching pantry items found.
+          </Typography>
 
-        <p>Try searching with a different name or add a new pantry item.</p>
-      </div>
+          <Typography color="text.secondary">
+            Try another search or add a new pantry item.
+          </Typography>
+        </CardContent>
+      </Card>
     );
   }
 
   return (
-    <div className="card" style={{ marginTop: "30px" }}>
-      <h2>📋 My Pantry</h2>
+    <div style={{ marginTop: 30 }}>
+      <Typography
+        variant="h4"
+        gutterBottom
+        fontWeight="bold"
+      >
+        📋 My Pantry
+      </Typography>
 
-      {items.map((item) => {
-        const status = getExpiryStatus(item.expiry);
+      <Grid container spacing={3}>
+        {items.map((item) => {
+          const status = getExpiryStatus(item.expiry);
 
-        return (
-          <div
-            key={item.id}
-            className="list-item"
-          >
-            <h2>{item.name}</h2>
-
-            <p>
-              <strong>🏷 Category:</strong>{" "}
-              {item.category || "Pantry"}
-            </p>
-
-            <p>
-              <strong>📦 Quantity:</strong> {item.quantity}
-            </p>
-
-            <p>
-              <strong>📅 Expiry:</strong>{" "}
-              {formatDate(item.expiry)}
-            </p>
-
-            <p
-              style={{
-                color: status.color,
-                fontWeight: "bold",
-              }}
+          return (
+            <Grid
+              item
+              xs={12}
+              md={6}
+              lg={4}
+              key={item.id}
             >
-              {status.text}
-            </p>
-
-            <div className="list-buttons">
-              <button onClick={() => onEdit(item)}>
-                ✏ Edit
-              </button>
-
-              <button
-                onClick={() => onDelete(item.id)}
-                style={{
-                  background: "#d32f2f",
+              <Card
+                elevation={4}
+                sx={{
+                  borderRadius: 3,
+                  height: "100%",
                 }}
               >
-                🗑 Delete
-              </button>
-            </div>
-          </div>
-        );
-      })}
+                <CardContent>
+
+                  <Typography
+                    variant="h5"
+                    fontWeight="bold"
+                    gutterBottom
+                  >
+                    {item.name}
+                  </Typography>
+
+                  <Divider sx={{ mb: 2 }} />
+
+                  <Stack spacing={1.5}>
+
+                    <Typography>
+                      <strong>🏷 Category:</strong>{" "}
+                      {item.category || "Pantry"}
+                    </Typography>
+
+                    <Typography>
+                      <strong>📦 Quantity:</strong>{" "}
+                      {item.quantity}
+                    </Typography>
+
+                    <Typography>
+                      <strong>📅 Expiry:</strong>{" "}
+                      {formatDate(item.expiry)}
+                    </Typography>
+
+                    <Chip
+                      label={status.text}
+                      sx={{
+                        bgcolor: status.color,
+                        color: "white",
+                        fontWeight: "bold",
+                        width: "fit-content",
+                      }}
+                    />
+
+                  </Stack>
+
+                  <Stack
+                    direction="row"
+                    spacing={2}
+                    sx={{ mt: 3 }}
+                  >
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      startIcon={<EditIcon />}
+                      onClick={() => onEdit(item)}
+                    >
+                      Edit
+                    </Button>
+
+                    <Button
+                      fullWidth
+                      variant="contained"
+                      color="error"
+                      startIcon={<DeleteIcon />}
+                      onClick={() => onDelete(item.id)}
+                    >
+                      Delete
+                    </Button>
+                  </Stack>
+
+                </CardContent>
+              </Card>
+            </Grid>
+          );
+        })}
+      </Grid>
     </div>
   );
 }
