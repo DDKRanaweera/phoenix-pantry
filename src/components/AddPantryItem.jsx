@@ -1,35 +1,54 @@
 import { useState, useEffect } from "react";
+
 import BarcodeScanner from "./BarcodeScanner";
+import ProductPreview from "./ProductPreview";
+import ProductFormFields from "./ProductFormFields";
+import CategorySelector from "./CategorySelector";
 
 import {
   Card,
   CardContent,
   Typography,
-  TextField,
   Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
   Collapse,
 } from "@mui/material";
 
-function AddPantryItem({ onSave, editingItem }) {
+function AddPantryItem({
+  onSave,
+  editingItem,
+}) {
   const [name, setName] = useState("");
   const [quantity, setQuantity] = useState("");
   const [expiry, setExpiry] = useState("");
   const [category, setCategory] = useState("Pantry");
 
   const [barcode, setBarcode] = useState("");
-  const [showScanner, setShowScanner] = useState(false);
+  const [brand, setBrand] = useState("");
+  const [image, setImage] = useState("");
+
+  const [showScanner, setShowScanner] =
+    useState(false);
 
   useEffect(() => {
     if (editingItem) {
-      setName(editingItem.name);
-      setQuantity(editingItem.quantity);
-      setExpiry(editingItem.expiry);
-      setCategory(editingItem.category || "Pantry");
-      setBarcode(editingItem.barcode || "");
+      setName(editingItem.name || "");
+      setQuantity(editingItem.quantity || "");
+      setExpiry(editingItem.expiry || "");
+      setCategory(
+        editingItem.category || "Pantry"
+      );
+
+      setBarcode(
+        editingItem.barcode || ""
+      );
+
+      setBrand(
+        editingItem.brand || ""
+      );
+
+      setImage(
+        editingItem.image || ""
+      );
     } else {
       resetForm();
     }
@@ -40,28 +59,19 @@ function AddPantryItem({ onSave, editingItem }) {
     setQuantity("");
     setExpiry("");
     setCategory("Pantry");
+
     setBarcode("");
+    setBrand("");
+    setImage("");
+
     setShowScanner(false);
-  }
-
-  function handleSubmit(e) {
-    e.preventDefault();
-
-    onSave({
-      name,
-      quantity: Number(quantity),
-      expiry,
-      category,
-      barcode,
-    });
-
-    resetForm();
   }
 
   function mapCategory(apiCategory) {
     if (!apiCategory) return "Pantry";
 
-    const value = apiCategory.toLowerCase();
+    const value =
+      apiCategory.toLowerCase();
 
     if (
       value.includes("milk") ||
@@ -72,13 +82,14 @@ function AddPantryItem({ onSave, editingItem }) {
       return "Dairy";
     }
 
-    if (value.includes("fruit")) {
+    if (
+      value.includes("fruit")
+    ) {
       return "Fruit";
     }
 
     if (
-      value.includes("vegetable") ||
-      value.includes("vegetables")
+      value.includes("vegetable")
     ) {
       return "Vegetables";
     }
@@ -92,7 +103,9 @@ function AddPantryItem({ onSave, editingItem }) {
       return "Meat";
     }
 
-    if (value.includes("frozen")) {
+    if (
+      value.includes("frozen")
+    ) {
       return "Frozen";
     }
 
@@ -125,17 +138,46 @@ function AddPantryItem({ onSave, editingItem }) {
   }
 
   function handleDetected(product) {
-    setBarcode(product.barcode || "");
+    setBarcode(
+      product.barcode || ""
+    );
+
+    setBrand(
+      product.brand || ""
+    );
+
+    setImage(
+      product.image || ""
+    );
 
     if (product.name) {
       setName(product.name);
     }
 
     if (product.category) {
-      setCategory(mapCategory(product.category));
+      setCategory(
+        mapCategory(product.category)
+      );
     }
 
     setShowScanner(false);
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+
+    onSave({
+      name,
+      quantity: Number(quantity),
+      expiry,
+      category,
+
+      barcode,
+      brand,
+      image,
+    });
+
+    resetForm();
   }
 
   return (
@@ -147,95 +189,71 @@ function AddPantryItem({ onSave, editingItem }) {
       }}
     >
       <CardContent>
+
         <Typography
           variant="h5"
           fontWeight="bold"
           align="center"
           gutterBottom
         >
-          {editingItem ? "Edit Pantry Item" : "Add Pantry Item"}
+          {editingItem
+            ? "Edit Pantry Item"
+            : "Add Pantry Item"}
         </Typography>
 
-        <form onSubmit={handleSubmit}>
+        <form
+          onSubmit={handleSubmit}
+        >
+
           <Button
             type="button"
             variant="outlined"
             fullWidth
-            sx={{ mb: 2 }}
-            onClick={() => setShowScanner(!showScanner)}
+            sx={{
+              mb: 2,
+            }}
+            onClick={() =>
+              setShowScanner(
+                !showScanner
+              )
+            }
           >
-            {showScanner ? "Close Scanner" : "📷 Scan Barcode"}
+            {showScanner
+              ? "Close Scanner"
+              : "📷 Scan Barcode"}
           </Button>
 
-          <Collapse in={showScanner}>
-            <BarcodeScanner onDetected={handleDetected} />
+          <Collapse
+            in={showScanner}
+          >
+            <BarcodeScanner
+              onDetected={
+                handleDetected
+              }
+            />
           </Collapse>
 
-          <TextField
-            fullWidth
-            label="Barcode"
-            margin="normal"
-            value={barcode}
-            InputProps={{
-              readOnly: true,
-            }}
+          {/* Continue in Part 2 */}
+                    <ProductPreview
+            image={image}
+            brand={brand}
+            name={name}
           />
 
-          <TextField
-            fullWidth
-            label="Item Name"
-            margin="normal"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
+          <ProductFormFields
+            barcode={barcode}
+            name={name}
+            quantity={quantity}
+            expiry={expiry}
+            setName={setName}
+            setQuantity={setQuantity}
+            setExpiry={setExpiry}
           />
 
-          <TextField
-            fullWidth
-            label="Quantity"
-            type="number"
-            margin="normal"
-            value={quantity}
-            onChange={(e) => setQuantity(e.target.value)}
-            required
+          <CategorySelector
+            category={category}
+            setCategory={setCategory}
           />
-
-          <TextField
-            fullWidth
-            label="Expiry Date"
-            type="date"
-            margin="normal"
-            value={expiry}
-            onChange={(e) => setExpiry(e.target.value)}
-            InputLabelProps={{
-              shrink: true,
-            }}
-            required
-          />
-
-          <FormControl
-            fullWidth
-            margin="normal"
-          >
-            <InputLabel>Category</InputLabel>
-
-            <Select
-              value={category}
-              label="Category"
-              onChange={(e) => setCategory(e.target.value)}
-            >
-              <MenuItem value="Pantry">🥫 Pantry</MenuItem>
-              <MenuItem value="Dairy">🥛 Dairy</MenuItem>
-              <MenuItem value="Fruit">🍎 Fruit</MenuItem>
-              <MenuItem value="Vegetables">🥦 Vegetables</MenuItem>
-              <MenuItem value="Meat">🥩 Meat</MenuItem>
-              <MenuItem value="Frozen">🧊 Frozen</MenuItem>
-              <MenuItem value="Drinks">🥤 Drinks</MenuItem>
-              <MenuItem value="Snacks">🍪 Snacks</MenuItem>
-              <MenuItem value="Bakery">🍞 Bakery</MenuItem>
-              <MenuItem value="Other">📦 Other</MenuItem>
-            </Select>
-          </FormControl>
 
           <Button
             type="submit"
@@ -248,9 +266,13 @@ function AddPantryItem({ onSave, editingItem }) {
               py: 1.5,
             }}
           >
-            {editingItem ? "Save Changes" : "Save Item"}
+            {editingItem
+              ? "Save Changes"
+              : "Save Item"}
           </Button>
+
         </form>
+
       </CardContent>
     </Card>
   );

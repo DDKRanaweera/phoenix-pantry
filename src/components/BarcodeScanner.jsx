@@ -17,6 +17,8 @@ function BarcodeScanner({ onDetected }) {
 
     const product = await getProduct(barcode);
 
+    console.log(product);
+
     setLoading(false);
 
     if (!product) {
