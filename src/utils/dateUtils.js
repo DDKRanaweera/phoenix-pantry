@@ -65,3 +65,25 @@ export function getExpiryStatus(expiryDate) {
     diffDays,
   };
 }
+
+export function getExpiryCategory(expiryDate) {
+  const { diffDays } = getExpiryStatus(expiryDate);
+
+  if (diffDays < 0) {
+    return "expired";
+  }
+
+  if (diffDays === 0) {
+    return "today";
+  }
+
+  if (diffDays <= 3) {
+    return "within3Days";
+  }
+
+  if (diffDays <= 7) {
+    return "within7Days";
+  }
+
+  return "healthy";
+}

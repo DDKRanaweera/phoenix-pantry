@@ -4,6 +4,7 @@ import AddPantryItem from "./AddPantryItem";
 import PantryList from "./PantryList";
 import CategoryChart from "./CategoryChart";
 import ExpiryChart from "./ExpiryChart";
+import ExpiryAlerts from "./ExpiryAlerts";
 
 import { getExpiryStatus } from "../utils/dateUtils";
 
@@ -155,6 +156,10 @@ function Dashboard({
           </Card>
         </Grid>
       </Grid>
+
+      {/* Expiry Alerts */}
+      
+      <ExpiryAlerts items={items} />
 
       {/* Charts */}
 
