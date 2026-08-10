@@ -6,6 +6,7 @@ import CategoryChart from "./CategoryChart";
 import ExpiryChart from "./ExpiryChart";
 import ExpiryAlerts from "./ExpiryAlerts";
 import ExpiringSoon from "./ExpiringSoon";
+import ExpiredItems from "./ExpiredItems";
 
 import { getExpiryStatus } from "../utils/dateUtils";
 
@@ -163,8 +164,12 @@ function Dashboard({
       <ExpiryAlerts items={items} />
 
       {/* Expiring Soon */}
-      
+
       <ExpiringSoon items={items} />
+
+      {/* Expired Items */}
+
+      <ExpiredItems items={items} />
 
       {/* Charts */}
 
