@@ -21,7 +21,6 @@ function ExpiryAlerts({ items }) {
       const category = getExpiryCategory(item.expiry);
 
       return (
-        category === "expired" ||
         category === "today" ||
         category === "within3Days"
       );
