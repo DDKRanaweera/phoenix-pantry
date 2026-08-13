@@ -169,7 +169,10 @@ function Dashboard({
 
       {/* Expired Items */}
 
-      <ExpiredItems items={items} />
+      <ExpiredItems
+        items={items}
+        onDelete={onDelete}
+      />
 
       {/* Charts */}
 
