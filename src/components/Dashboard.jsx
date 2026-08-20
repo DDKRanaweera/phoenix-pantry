@@ -7,6 +7,7 @@ import ExpiryChart from "./ExpiryChart";
 import ExpiryAlerts from "./ExpiryAlerts";
 import ExpiringSoon from "./ExpiringSoon";
 import ExpiredItems from "./ExpiredItems";
+import FoodWasteHistory from "./FoodWasteHistory";
 
 import { getExpiryStatus } from "../utils/dateUtils";
 
@@ -37,7 +38,11 @@ function Dashboard({
   editingItem,
 }) {
   const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [selectedCategory, setSelectedCategory] =
+    useState("All");
+
+  const [foodWasteRefresh, setFoodWasteRefresh] =
+    useState(0);
 
   let expired = 0;
   let todayCount = 0;
@@ -57,14 +62,23 @@ function Dashboard({
 
   const filteredItems = items.filter((item) => {
     const matchesSearch =
-      item.name.toLowerCase().includes(search.toLowerCase());
+      item.name
+        .toLowerCase()
+        .includes(search.toLowerCase());
 
     const matchesCategory =
       selectedCategory === "All" ||
-      (item.category || "Pantry") === selectedCategory;
+      (item.category || "Pantry") ===
+        selectedCategory;
 
     return matchesSearch && matchesCategory;
   });
+
+  function handleFoodWasteRecorded() {
+    setFoodWasteRefresh(
+      (current) => current + 1
+    );
+  }
 
   return (
     <div
@@ -87,10 +101,16 @@ function Dashboard({
 
       <Grid container spacing={3} sx={{ mb: 4 }}>
         <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={4} sx={{ borderRadius: 3 }}>
+          <Card
+            elevation={4}
+            sx={{ borderRadius: 3 }}
+          >
             <CardContent sx={{ textAlign: "center" }}>
               <Inventory2Icon
-                sx={{ fontSize: 55, color: "#2E7D32" }}
+                sx={{
+                  fontSize: 55,
+                  color: "#2E7D32",
+                }}
               />
 
               <Typography variant="h3">
@@ -105,10 +125,16 @@ function Dashboard({
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={4} sx={{ borderRadius: 3 }}>
+          <Card
+            elevation={4}
+            sx={{ borderRadius: 3 }}
+          >
             <CardContent sx={{ textAlign: "center" }}>
               <WarningAmberIcon
-                sx={{ fontSize: 55, color: "#ef6c00" }}
+                sx={{
+                  fontSize: 55,
+                  color: "#ef6c00",
+                }}
               />
 
               <Typography variant="h3">
@@ -123,10 +149,16 @@ function Dashboard({
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={4} sx={{ borderRadius: 3 }}>
+          <Card
+            elevation={4}
+            sx={{ borderRadius: 3 }}
+          >
             <CardContent sx={{ textAlign: "center" }}>
               <EventAvailableIcon
-                sx={{ fontSize: 55, color: "#1565C0" }}
+                sx={{
+                  fontSize: 55,
+                  color: "#1565C0",
+                }}
               />
 
               <Typography variant="h3">
@@ -141,10 +173,16 @@ function Dashboard({
         </Grid>
 
         <Grid item xs={12} sm={6} md={3}>
-          <Card elevation={4} sx={{ borderRadius: 3 }}>
+          <Card
+            elevation={4}
+            sx={{ borderRadius: 3 }}
+          >
             <CardContent sx={{ textAlign: "center" }}>
               <ErrorIcon
-                sx={{ fontSize: 55, color: "#D32F2F" }}
+                sx={{
+                  fontSize: 55,
+                  color: "#D32F2F",
+                }}
               />
 
               <Typography variant="h3">
@@ -172,6 +210,15 @@ function Dashboard({
       <ExpiredItems
         items={items}
         onDelete={onDelete}
+        onFoodWasteRecorded={
+          handleFoodWasteRecorded
+        }
+      />
+
+      {/* Food Waste History */}
+
+      <FoodWasteHistory
+        refreshTrigger={foodWasteRefresh}
       />
 
       {/* Charts */}
@@ -208,7 +255,6 @@ function Dashboard({
         }}
       >
         <CardContent>
-
           <Typography
             variant="h5"
             align="center"
@@ -219,7 +265,6 @@ function Dashboard({
           </Typography>
 
           <Stack spacing={3}>
-
             <TextField
               label="Search Item"
               fullWidth
@@ -230,7 +275,6 @@ function Dashboard({
             />
 
             <FormControl fullWidth>
-
               <InputLabel>
                 Category
               </InputLabel>
@@ -239,29 +283,67 @@ function Dashboard({
                 value={selectedCategory}
                 label="Category"
                 onChange={(e) =>
-                  setSelectedCategory(e.target.value)
+                  setSelectedCategory(
+                    e.target.value
+                  )
                 }
               >
-                <MenuItem value="All">All Categories</MenuItem>
-                <MenuItem value="Pantry">🥫 Pantry</MenuItem>
-                <MenuItem value="Dairy">🥛 Dairy</MenuItem>
-                <MenuItem value="Fruit">🍎 Fruit</MenuItem>
-                <MenuItem value="Vegetables">🥦 Vegetables</MenuItem>
-                <MenuItem value="Meat">🥩 Meat</MenuItem>
-                <MenuItem value="Frozen">🧊 Frozen</MenuItem>
-                <MenuItem value="Drinks">🥤 Drinks</MenuItem>
-                <MenuItem value="Snacks">🍪 Snacks</MenuItem>
-                <MenuItem value="Bakery">🍞 Bakery</MenuItem>
-                <MenuItem value="Other">📦 Other</MenuItem>
-              </Select>
+                <MenuItem value="All">
+                  All Categories
+                </MenuItem>
 
+                <MenuItem value="Pantry">
+                  🥫 Pantry
+                </MenuItem>
+
+                <MenuItem value="Dairy">
+                  🥛 Dairy
+                </MenuItem>
+
+                <MenuItem value="Fruit">
+                  🍎 Fruit
+                </MenuItem>
+
+                <MenuItem value="Vegetables">
+                  🥦 Vegetables
+                </MenuItem>
+
+                <MenuItem value="Meat">
+                  🥩 Meat
+                </MenuItem>
+
+                <MenuItem value="Frozen">
+                  🧊 Frozen
+                </MenuItem>
+
+                <MenuItem value="Drinks">
+                  🥤 Drinks
+                </MenuItem>
+
+                <MenuItem value="Snacks">
+                  🍪 Snacks
+                </MenuItem>
+
+                <MenuItem value="Bakery">
+                  🍞 Bakery
+                </MenuItem>
+
+                <MenuItem value="Other">
+                  📦 Other
+                </MenuItem>
+              </Select>
             </FormControl>
 
             <Typography align="center">
-              Showing <strong>{filteredItems.length}</strong> item(s)
+              Showing{" "}
+              <strong>
+                {filteredItems.length}
+              </strong>{" "}
+              item(s)
             </Typography>
 
-            {(search || selectedCategory !== "All") && (
+            {(search ||
+              selectedCategory !== "All") && (
               <Button
                 variant="outlined"
                 color="secondary"
@@ -273,9 +355,7 @@ function Dashboard({
                 Clear Filters
               </Button>
             )}
-
           </Stack>
-
         </CardContent>
       </Card>
 

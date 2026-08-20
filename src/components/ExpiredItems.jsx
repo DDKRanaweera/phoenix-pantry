@@ -19,7 +19,11 @@ import { getExpiryStatus } from "../utils/dateUtils";
 
 import ExpiredItemReviewDialog from "./ExpiredItemReviewDialog";
 
-function ExpiredItems({ items, onDelete }) {
+function ExpiredItems({
+  items,
+  onDelete,
+  onFoodWasteRecorded,
+}) {
   const [selectedItem, setSelectedItem] =
     useState(null);
 
@@ -81,6 +85,10 @@ function ExpiredItems({ items, onDelete }) {
       // 2. Only delete from pantry after
       //    the waste record succeeds.
       await onDelete(selectedItem.id);
+
+      if (onFoodWasteRecorded) {
+        onFoodWasteRecorded();
+      }
 
       // 3. Close the dialog.
       setSelectedItem(null);
