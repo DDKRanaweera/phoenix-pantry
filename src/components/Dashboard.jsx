@@ -8,6 +8,7 @@ import ExpiryAlerts from "./ExpiryAlerts";
 import ExpiringSoon from "./ExpiringSoon";
 import ExpiredItems from "./ExpiredItems";
 import FoodWasteHistory from "./FoodWasteHistory";
+import FoodWasteSummary from "./FoodWasteSummary";
 
 import { getExpiryStatus } from "../utils/dateUtils";
 
@@ -213,6 +214,12 @@ function Dashboard({
         onFoodWasteRecorded={
           handleFoodWasteRecorded
         }
+      />
+
+      {/* Food Waste Summary */}
+
+      <FoodWasteSummary
+        refreshTrigger={foodWasteRefresh}
       />
 
       {/* Food Waste History */}
