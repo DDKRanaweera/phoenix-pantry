@@ -148,37 +148,43 @@ function FoodWasteSummary({
 
   const totalWasteEvents = wasteItems.length;
 
-  const totalUnitsWasted = wasteItems.reduce(
-    (total, item) =>
-      total + (Number(item.quantity) || 0),
-    0
-  );
+  const totalUnitsWasted =
+    wasteItems.reduce(
+      (total, item) =>
+        total +
+        (Number(item.quantity) || 0),
+      0
+    );
 
   const currentMonthUnitsWasted =
     currentMonthItems.reduce(
       (total, item) =>
-        total + (Number(item.quantity) || 0),
+        total +
+        (Number(item.quantity) || 0),
       0
     );
 
   const previousMonthUnitsWasted =
     previousMonthItems.reduce(
       (total, item) =>
-        total + (Number(item.quantity) || 0),
+        total +
+        (Number(item.quantity) || 0),
       0
     );
 
-  const categoryCounts = wasteItems.reduce(
-    (counts, item) => {
-      const category = item.category || "Other";
+  const categoryCounts =
+    wasteItems.reduce(
+      (counts, item) => {
+        const category =
+          item.category || "Other";
 
-      counts[category] =
-        (counts[category] || 0) + 1;
+        counts[category] =
+          (counts[category] || 0) + 1;
 
-      return counts;
-    },
-    {}
-  );
+        return counts;
+      },
+      {}
+    );
 
   const mostWastedCategory =
     Object.entries(categoryCounts).sort(
@@ -190,40 +196,69 @@ function FoodWasteSummary({
       ? wasteItems[0]
       : null;
 
-  function calculateChange(
+  function calculatePercentageChange(
     previousValue,
     currentValue
   ) {
     if (previousValue === 0) {
-      if (currentValue === 0) {
-        return 0;
-      }
-
-      return null;
+      return currentValue === 0
+        ? 0
+        : null;
     }
 
     return (
-      ((previousValue - currentValue) /
+      ((currentValue - previousValue) /
         previousValue) *
       100
     );
   }
 
-  const wasteEventChange = calculateChange(
-    previousMonthItems.length,
-    currentMonthItems.length
-  );
+  const wasteEventChange =
+    calculatePercentageChange(
+      previousMonthItems.length,
+      currentMonthItems.length
+    );
 
-  const unitsWastedChange = calculateChange(
-    previousMonthUnitsWasted,
-    currentMonthUnitsWasted
-  );
+  const unitsWastedChange =
+    calculatePercentageChange(
+      previousMonthUnitsWasted,
+      currentMonthUnitsWasted
+    );
 
-  function renderChange(
+  function renderComparison(
+    label,
     change,
     currentValue,
     previousValue
   ) {
+    if (
+      previousValue === 0 &&
+      currentValue === 0
+    ) {
+      return (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 0.5,
+            mt: 1,
+          }}
+        >
+          <TrendingFlatIcon
+            color="action"
+            fontSize="small"
+          />
+
+          <Typography
+            variant="body2"
+            color="text.secondary"
+          >
+            {label}: No change
+          </Typography>
+        </Box>
+      );
+    }
+
     if (
       previousValue === 0 &&
       currentValue > 0
@@ -247,71 +282,13 @@ function FoodWasteSummary({
             color="error"
             fontWeight="bold"
           >
-            Increased this month
+            {label}: New activity this month
           </Typography>
         </Box>
       );
-    }
-
-    if (
-      previousValue === 0 &&
-      currentValue === 0
-    ) {
-      return (
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 0.5,
-            mt: 1,
-          }}
-        >
-          <TrendingFlatIcon
-            color="action"
-            fontSize="small"
-          />
-
-          <Typography
-            variant="body2"
-            color="text.secondary"
-          >
-            No change
-          </Typography>
-        </Box>
-      );
-    }
-
-    if (change === null) {
-      return null;
     }
 
     if (change > 0) {
-      return (
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            gap: 0.5,
-            mt: 1,
-          }}
-        >
-          <TrendingDownIcon
-            color="success"
-            fontSize="small"
-          />
-
-          <Typography
-            variant="body2"
-            color="success.main"
-            fontWeight="bold"
-          >
-            {change.toFixed(1)}% reduction
-          </Typography>
-        </Box>
-      );
-    }
-
-    if (change < 0) {
       return (
         <Box
           sx={{
@@ -331,7 +308,36 @@ function FoodWasteSummary({
             color="error"
             fontWeight="bold"
           >
-            {Math.abs(change).toFixed(1)}% increase
+            {label}: {change.toFixed(1)}%
+            increase
+          </Typography>
+        </Box>
+      );
+    }
+
+    if (change < 0) {
+      return (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            gap: 0.5,
+            mt: 1,
+          }}
+        >
+          <TrendingDownIcon
+            color="success"
+            fontSize="small"
+          />
+
+          <Typography
+            variant="body2"
+            color="success.main"
+            fontWeight="bold"
+          >
+            {label}:{" "}
+            {Math.abs(change).toFixed(1)}%
+            reduction
           </Typography>
         </Box>
       );
@@ -355,7 +361,7 @@ function FoodWasteSummary({
           variant="body2"
           color="text.secondary"
         >
-          No change
+          {label}: No change
         </Typography>
       </Box>
     );
@@ -617,7 +623,7 @@ function FoodWasteSummary({
                   sm: "1fr 1fr",
                 },
                 gap: 2,
-                mb: 3,
+                mb: 2,
               }}
             >
               <Box
@@ -657,12 +663,6 @@ function FoodWasteSummary({
                   Units wasted:{" "}
                   {currentMonthUnitsWasted}
                 </Typography>
-
-                {renderChange(
-                  wasteEventChange,
-                  currentMonthItems.length,
-                  previousMonthItems.length
-                )}
               </Box>
 
               <Box
@@ -702,16 +702,33 @@ function FoodWasteSummary({
                   Units wasted:{" "}
                   {previousMonthUnitsWasted}
                 </Typography>
-
-                {renderChange(
-                  unitsWastedChange,
-                  currentMonthUnitsWasted,
-                  previousMonthUnitsWasted
-                )}
               </Box>
             </Box>
 
-            <Divider sx={{ mb: 2 }} />
+            <Box
+              sx={{
+                px: 2,
+                py: 1.5,
+                borderRadius: 2,
+                backgroundColor: "#fafafa",
+              }}
+            >
+              {renderComparison(
+                "Waste events",
+                wasteEventChange,
+                currentMonthItems.length,
+                previousMonthItems.length
+              )}
+
+              {renderComparison(
+                "Units wasted",
+                unitsWastedChange,
+                currentMonthUnitsWasted,
+                previousMonthUnitsWasted
+              )}
+            </Box>
+
+            <Divider sx={{ my: 2 }} />
 
             <Box
               sx={{
